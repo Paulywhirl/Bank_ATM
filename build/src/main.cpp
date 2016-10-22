@@ -5,7 +5,7 @@
 #include "UserFunctions.h"
 #include <sstream>
 using namespace std;
-#define SIZE 70
+#define SIZE 100
 
 int main() {
 
@@ -13,16 +13,17 @@ int main() {
     bool user = false, user_type = false;
     int type, i = 0, back, option, lineNumber =0;
     string u_name, p_word, firstname;
-    string line[SIZE], the_line;
+    string this_line[SIZE], the_line;
     Customer new_user;
     UserFunctions Menu;
     ifstream infile;
     infile.open("C:\\Users\\Owner\\Documents\\Third Year\\Comp Sci 3307\\Bank_ATM\\build\\res\\Customers");
 
 
-    cout << "Welcome to your ATM machine!" << endl;
+    cout << "\nWelcome to your ATM machine!" << endl;
 
     do {
+
         cout << endl << "Please indicate your user-type:" << endl;
         cout << "1 - Customer\n2 - Manager\n" << endl;
         cin >> type;
@@ -51,20 +52,18 @@ int main() {
 
                         stringstream ssin(the_line);
                         while (ssin.good() && i < 3) {
-                            ssin >> line[i];
+                            ssin >> this_line[i];
                             ++i;
                         }
 
-                        if (line[0] == u_name) {
+                        if (this_line[0] == u_name) {
 
-                            if (line[1] == p_word) {
+                            if (this_line[1] == p_word) {
                                 cout << "\nyou're in\n";
                                 user = true;
-                                firstname = line[2];
-
-
+                                firstname = this_line[2];
+                                //infile.close();
                                 Menu = *new UserFunctions();
-                                cout << "what up";
                                 Menu.startUp(firstname, type);
 
                                 break;
@@ -93,7 +92,7 @@ int main() {
                     }
 
                 } else {
-                    cout << "file could not open";
+                    cout << "file could not open\n";
                 }
             }
         }
