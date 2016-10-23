@@ -5,24 +5,23 @@
 #include "UserFunctions.h"
 #include <sstream>
 using namespace std;
-#define SIZE 70
+#define SIZE 100
 
 int main() {
 
 
     bool user = false, user_type = false;
-    int type, i = 0, back, option, lineNumber =0;
+    int type, i = 0, back;
     string u_name, p_word, firstname;
-    string line[SIZE], the_line;
-    Customer new_user;
+    string uInfo[SIZE], the_line;
+    User new_user;
     UserFunctions Menu;
     ifstream infile;
-    infile.open("C:\\Users\\Owner\\Documents\\Third Year\\Comp Sci 3307\\Bank_ATM\\build\\res\\Customers");
 
-
-    cout << "Welcome to your ATM machine!" << endl;
+    cout << "\nWelcome to your ATM machine!" << endl;
 
     do {
+
         cout << endl << "Please indicate your user-type:" << endl;
         cout << "1 - Customer\n2 - Manager\n" << endl;
         cin >> type;
@@ -44,6 +43,7 @@ int main() {
                 cout << "\nPassword: ";
                 cin >> p_word;
 
+                infile.open("C:\\Users\\Owner\\Documents\\Third Year\\Comp Sci 3307\\Bank_ATM\\build\\res\\Customers");
                 if (infile.is_open()) {
                     while (infile) {
 
@@ -51,20 +51,24 @@ int main() {
 
                         stringstream ssin(the_line);
                         while (ssin.good() && i < 3) {
-                            ssin >> line[i];
+                            ssin >> uInfo[i];
                             ++i;
                         }
 
-                        if (line[0] == u_name) {
+                        if (uInfo[0] == u_name) {
 
-                            if (line[1] == p_word) {
+                            if (uInfo[1] == p_word) {
                                 cout << "\nyou're in\n";
                                 user = true;
-                                firstname = line[2];
+                                firstname = uInfo[2];
+                                infile.close();
 
+                                ofstream log("C:\\Users\\Owner\\Documents\\Third Year\\Comp Sci 3307\\Bank_ATM\\build\\res\\log");
+                                string this_person = uInfo[2]+" "+uInfo[3];
+                                log << this_person << endl;
 
+                                
                                 Menu = *new UserFunctions();
-                                cout << "what up";
                                 Menu.startUp(firstname, type);
 
                                 break;
@@ -73,7 +77,6 @@ int main() {
                         }
 
                         i = 0;
-                        lineNumber++;
                         if(infile.eof()){
                             break;
                         }
@@ -82,7 +85,6 @@ int main() {
                         infile.close();
                         cout << "***Incorrect Username or Password***\n\nGo Home?\n1-back\n0-stay\n";
                         cin >> back;
-                        infile.open("C:\\Users\\Owner\\Documents\\Third Year\\Comp Sci 3307\\Bank_ATM\\build\\res\\Customers");
 
                         if (back == 1) {
                             type =0;
@@ -93,7 +95,62 @@ int main() {
                     }
 
                 } else {
-                    cout << "file could not open";
+                    cout << "file could not open\n";
+                }
+            }
+            if(type ==2){
+                cout << "Username: ";
+                cin >> u_name;
+                cout << "\nPassword: ";
+                cin >> p_word;
+
+                infile.open("C:\\Users\\Owner\\Documents\\Third Year\\Comp Sci 3307\\Bank_ATM\\build\\res\\Managers");
+                if (infile.is_open()) {
+                    while (infile) {
+
+                        getline(infile, the_line);
+
+                        stringstream ssin(the_line);
+                        while (ssin.good() && i < 3) {
+                            ssin >> uInfo[i];
+                            ++i;
+                        }
+
+                        if (uInfo[0] == u_name) {
+
+                            if (uInfo[1] == p_word) {
+                                cout << "\nyou're in\n";
+                                user = true;
+                                firstname = uInfo[2];
+                                //infile.close();
+                                Menu = *new UserFunctions();
+                                Menu.startUp(firstname, type);
+
+                                break;
+                            }
+                            break;
+                        }
+
+                        i = 0;
+                        if(infile.eof()){
+                            break;
+                        }
+                    }
+                    if (!user) {
+                        infile.close();
+                        cout << "\n***Incorrect Username or Password***\n\nGo Home?\n1-back\n0-stay\n";
+                        cin >> back;
+
+                        if (back == 1) {
+                            type =0;
+                            break;
+                        }
+                    }else{
+                        infile.close();
+                    }
+
+                } else {
+                    cout << "file could not open\n";
                 }
             }
         }
