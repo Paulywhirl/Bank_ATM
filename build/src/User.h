@@ -5,6 +5,7 @@
 #ifndef BANK_ATM_USER_H
 #define BANK_ATM_USER_H
 #include<string>
+#import "Activity.h"
 
 using namespace std;
 
@@ -16,6 +17,7 @@ public:
     string firstname, lastname;
     enum Type_user {Customer, Manager, Administrator}type_of_user;
     double checking, saving;
+    bool check, save;
 
 public:
     User();
@@ -28,8 +30,8 @@ public:
     const string &getFirstname() const;
     const string &getLastname() const;
     Type_user getType_of_user() const;
-    bool isChecking() const;
-    bool isSaving() const;
+    double isChecking();
+    double isSaving();
     void SetUserType(int type);
 
     void setUsername(const string &username);
@@ -39,29 +41,24 @@ public:
     void setType_of_user(Type_user type_of_user);
     void setChecking(double checking);
     void setSaving(double saving);
-};
 
+    void setCheck(bool val);
+    void setSave(bool val);
+    bool getCheck();
+    bool getSave();
 
+    void withdrawCheck(double amount, User *user, Activity *a);
+    void withdrawSave(double amount, User *user,Activity *a);
 
-class Manager: public User{
+    void depositCheck(double amount, User *user, Activity *a);
+    void depositSave(double amount, User *user, Activity *a);
 
-public:
-    Manager(string x, string p_word) : User(username, password){
+    void transferCtoS(double amount, User *user, Activity *a);
+    void transferStoC(double amount, User *user, Activity *a);
 
-    }
+    int getUserChoice();
 
-
-
-};
-
-class Customer: public User{
-
-public:
-    Customer();
-
-    Customer(string first, string last, double check, double save);
-
-    void setUserInfo(string username, int lineNumber, Customer user);
+    double trunc_double(double val);
 };
 
 

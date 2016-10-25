@@ -5,22 +5,32 @@
 #include "User.h"
 #include <sstream>
 #include <fstream>
+#include <iostream>
+#include <iomanip>
+#include <cmath>
 
 
-    User::User(){
+User::User(){
+        checking = 0.00;
+        saving = 0.00;
+        check = true;
+        save = true;
     }
 
 
     User::User(string u_name, string p_name){
-    username = u_name;
-    password = p_name;
+        username = u_name;
+        password = p_name;
+        checking = 0.00;
     }
 
 
     User::User(string u_name, string p_name, Type_user user){
-    username = u_name;
-    password = p_name;
-    type_of_user = user;
+        username = u_name;
+        password = p_name;
+        type_of_user = user;
+        checking = 0.00;
+        saving = 0.00;
     }
 
 
@@ -40,11 +50,15 @@ const string &User::getLastname() const {
 User::Type_user User::getType_of_user() const {
     return type_of_user;
 }
-bool User::isChecking() const {
-    return checking;
+
+double User::isChecking() {
+    double new_check = trunc_double(checking);
+    return new_check;
 }
-bool User::isSaving() const {
-    return saving;
+
+double User::isSaving() {
+    double new_save = trunc_double(saving);
+    return new_save;
 }
 
 
@@ -74,45 +88,253 @@ void User::setSaving(double saving) {
     User::saving = saving;
 }
 
-//*************************************************************************************//
 
+void User::withdrawCheck(double amount, User *user, Activity *a) {
+    double curr = user->isChecking();
+    double new_amount = 0.00;
+    int option =0;
 
-//*************************************************************************************//
+    new_amount = trunc_double(curr - amount);
 
-Customer::Customer(){
-}
+    if(user->check == false){
+        cout <<"\n****You do not have a Checkings Account****\n";
+        a->setTransact(false);
+        return;
+    }
+    if(new_amount < 0){
+        cout << "\n****Insufficient funds****\n";
+        user->setChecking(curr);
+        a->setTransact(false);
+        return;
+    }
 
-Customer::Customer(string first, string last, double check, double save){
-        firstname = first;
-        lastname = last;
-        checking = check;
-        saving = save;
+    if(curr > 1000.00 && new_amount < 1000.00){
 
-}
+            cout << "**If you proceed you will be under the threshold of\n$1000.00, a $2.00 tax will be taken, ";
+            cout << "procced?\n* 1 - I understand\n* Any Other button - Nevermind\n";
+            option = getUserChoice();
 
-/*void Customer::setUserInfo(string f_name, int lineNumber, Customer user){
+            if (option == 1) {
+                new_amount -= 2.00;
+                if (new_amount < 0) {
+                    cout << "Insufficient funds\n\n";
+                    user->setChecking(curr);
+                    a->setTransact(false);
+                    cin.clear();
+                    return;
+                }
+                user->setChecking(new_amount);
+                a->setActivity("Withdraw from Checking: ");
+                a->setAmount(amount);
+                cout << "\nAfter transaction: " << user->isChecking();
+                cin.clear();
+                return;
+            }
+            else {
 
-
-    string line[100], the_line;
-    ifstream customerFileR;
-    customerFileR.open("Customers");
-    if(customerFileR.is_open()) {
-        cout << "it opened"
-        for(int i;i<=lineNumber; i++){
-            getline(customerFileR, the_line);
-        }
-        stringstream ssin(the_line);
-        for (int i; ssin.good() && i < 7; i++) {
-            ssin >> line[i];
-        }
-        user.setFirstname(f_name);
-        user.setLastname(line[1]);
-        user.setChecking(stod(line[3]));
-        user.setSaving(stod(line[5]));
-
+                user->setChecking(curr);
+                a->setTransact(false);
+                cin.clear();
+                return;
+            }
 
     }
-        customerFileR.close();
 
-}*/
+    user->setChecking(new_amount);
+    a->setActivity("Withdraw from Checking: ");
+    a->setAmount(amount);
+    a->setTransact(true);
+    cout << "\nAfter transaction: " << user->isChecking();
+    return;
+}
 
+void User::withdrawSave(double amount, User *user, Activity *a) {
+    double curr = user->isSaving();
+    double new_amount = 0.00;
+    int option =0;
+
+    new_amount = curr - amount;
+
+
+    if(user->save == false){
+        cout <<"\n****You do not have a Savings Account****\n";
+        return;
+    }
+
+    if(new_amount < 0){
+        cout << "\n****Insufficient funds****\n";
+        user->setSaving(curr);
+        return;
+    }
+
+    if(curr > 1000.00 && new_amount < 1000.00){
+
+        cout << "**If you proceed you will be under the threshold of\n$1000.00, a $2.00 tax will be taken, ";
+        cout << "procced?\n* 1 - I understand\n* Any Other button - Nevermind\n";
+        option = getUserChoice();
+
+        if (option == 1) {
+            new_amount -= 2.00;
+            if (new_amount < 0) {
+                cout << "Insufficient funds\n\n";
+                user->setSaving(curr);
+                a->setTransact(false);
+                cin.clear();
+                return;
+            }
+            user->setSaving(new_amount);
+            a->setActivity("Withdraw from Saving: ");
+            a->setAmount(amount);
+            cin.clear();
+            return;
+        }
+        else {
+
+            user->setSaving(curr);
+            a->setTransact(false);
+            cin.clear();
+            return;
+        }
+
+    }
+
+    user->setSaving(new_amount);
+    a->setActivity("Withdraw from Saving: ");
+    a->setAmount(amount);
+    a->setTransact(true);
+    cout << "\nAfter transaction: " << user->isSaving();
+    return;
+}
+
+void User::depositCheck(double amount, User *user, Activity *a) {
+    double curr = user->isChecking();
+    double new_amount= 0.00;
+
+    new_amount = curr + amount;
+    user->setChecking(new_amount);
+    a->setActivity("Deposited to Checking: ");
+    a->setAmount(amount);
+    a->setTransact(true);
+
+    if(user->check == false){
+        cout <<"\n****You do not have a Checkings Account****\n";
+        a->setTransact(false);
+        return;
+    }
+
+    cout << "\nNew Balance: " << user->isChecking();
+    return;
+}
+
+void User::depositSave(double amount, User *user, Activity *a) {
+    double curr = user->isSaving();
+    double new_amount = 0.00;
+
+    new_amount = curr + amount;
+    user->setSaving(new_amount);
+    a->setActivity("Deposited to Saving:");
+    a->setAmount(amount);
+    a->setTransact(true);
+
+    if(user->save == false){
+        cout <<"\n****You do not have a Savings Account****\n";
+        a->setTransact(false);
+        return;
+    }
+
+    if(user->check == false){
+        cout <<"\n****You do not have a Checkings Account****\n";
+        return;
+    }
+
+    cout << "\nNew Balance: " << user->isSaving();
+    return;
+}
+
+void User::transferCtoS(double amount, User *user, Activity *a) {
+    double currC = user->isChecking();
+    double currS = user->isSaving();
+    double new_amount = currC - amount;
+
+    if(user->check == false){
+        cout <<"\n****You do not have a Checkings Account****\n";
+        a->setTransact(false);
+        return;
+    }
+
+    if(new_amount<0){
+        cout << "Insufficient funds\n";
+        user->setChecking(currC);
+        a->setTransact(false);
+        return;
+    }
+    else {
+        user->setChecking(new_amount);
+        double new_save = currS + amount;
+        double new_check = currC - amount;
+        user->setSaving(new_save);
+        user->setChecking(new_check);
+        a->setActivity("Transfered to Savings");
+        a->setAmount(amount);
+        a->setTransact(true);
+    }
+    return;
+}
+
+void User::transferStoC(double amount, User *user, Activity *a) {
+    double currC = user->isChecking();
+    double currS = user->isSaving();
+    double new_amount = currS - amount;
+
+    if(user->save == false){
+        cout <<"\n****You do not have a Savings Account****\n";
+        a->setTransact(false);
+        return;
+    }
+
+    if(new_amount<0){
+        cout << "Insufficient funds\n";
+        user->setSaving(currS);
+        a->setTransact(false);
+        return;
+    }
+    else {
+        user->setSaving(new_amount);
+        double new_check = currC + amount;
+        double new_save = currS - amount;
+        user->setSaving(new_save);
+        user->setChecking(new_check);
+        a->setActivity("Transfered to Checking");
+        a->setAmount(amount);
+        a->setTransact(true);
+    }
+    return;
+}
+
+void User::setCheck(bool val) {
+    check = val;
+}
+void User::setSave(bool val) {
+    save = val;
+}
+bool User::getCheck() {
+    return check;
+}
+bool User::getSave() {
+    return save;
+}
+int User::getUserChoice(){
+    int choice =0;
+    cin >> choice;
+    return choice;
+}
+
+double User::trunc_double(double val){
+    double temp =0.0;
+
+    temp = (int) (val * pow(10,2));
+
+    temp /= pow(10,2);
+
+    return temp;
+}
